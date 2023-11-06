@@ -1,0 +1,20 @@
+<!-- appname/templates/upload_excel.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <a class="navbar-brand text-white" href="#">Django Excel Upload</a>
+<a class="nav-link text-white" href="{% url 'upload_excel' %}">Upload Excel</a>
+<h2 class="text-white">Upload an Excel File</h2>
+    <form method="post" enctype="multipart/form-data" class="mt-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Upload Excel</button>
+    </form>
+    {% if error_message %}
+    <div class="alert alert-danger mt-3">
+        {{ error_message }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

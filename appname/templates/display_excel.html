@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Excel File Content</h2>
+    <form method="post" action="{% url 'save_excel_data' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="uploaded_file" value="{{ uploaded_file.url }}">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    {% for header in data.0 %}
+                    <th>{{ header }}</th>
+                    <input type="hidden" name="headers[]" value="{{ header }}">
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data|slice:"1:" %}
+                <tr>
+                    {% for cell in row %}
+                    <td>
+                        <input type="text" name="data[]" value="{{ cell }}">
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" name="save_button">Save</button>
+    </form>
+</div>
+</div>
+{% endblock %}
