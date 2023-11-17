@@ -1,4 +1,5 @@
 import json
+import requests
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render,redirect
 from openpyxl import load_workbook
@@ -41,6 +42,7 @@ def upload_excel(request):
     else:
         form = ExcelFileForm()
     return render(request, 'upload_excel.html', {'form': form})
+
 def save_excel_data(request):
     if request.method == "POST":
         if "save_button" in request.POST:
@@ -56,13 +58,73 @@ def save_excel_data(request):
             # Create a list of dictionaries where each dictionary represents a row
             rows = [dict(zip(headers, data[i:i+num_columns])) for i in range(0, len(data), num_columns)]
 
-            # Convert the data to JSON
+            print("Sending JSON data:", rows)
             json_data = json.dumps(rows)
 
-            # Display JSON data in json_display.html
-            return render(request, 'json_display.html', {'json_data': json_data})
+            # Send JSON data to the API
+            api_url = 'http://127.0.0.1:8000/fetch/'
+            try:
+                response = requests.post(api_url, json=rows, headers={'Content-Type': 'application/json'})
+
+                # Check if the request was successful (status code 200)
+                if response.status_code == 200:
+                    # Display the API response in json_display.html
+                    api_response = response.json()
+                    print("API Response:", api_response)
+                    return render(request, 'json_display.html', {'json_data': json.dumps(api_response), 'api_response': api_response})
+                else:
+                    # If the request was not successful, handle the error accordingly
+                    print(f'API request failed with status code {response.status_code}')
+                    return render(request, 'error.html', {'error_message': f'API request failed with status code {response.status_code}'})
+            except requests.RequestException as e:
+                # Handle other request-related exceptions
+                print(f'Request failed: {str(e)}')
+                return render(request, 'error.html', {'error_message': f'Request failed: {str(e)}'})
 
     return render(request, 'upload_excel.html')
+# def save_excel_data(request):
+#     if request.method == "POST":
+#         if "save_button" in request.POST:
+#             # Example JSON array
+#             json_array = [
+#                 {
+#                     "productName": "Fivestar",
+#                     "weight": "",
+#                     "mrp": "350",
+#                     "sellPrice": "",
+#                     "hsnCode": "",
+#                     "gstPercent": "",
+#                     "productCategory": ""
+#                 },
+#                 {
+#                     "productName": "Gulabjamun",
+#                     "weight": "500g",
+#                     "mrp": "",
+#                     "sellPrice": "",
+#                     "hsnCode": "",
+#                     "gstPercent": "",
+#                     "productCategory": ""
+#                 }
+#             ]
+
+#             # Send JSON data to the API
+#             api_url = 'http://127.0.0.1:8000/fetch/'
+#             try:
+#                 response = requests.post(api_url, json=json_array, headers={'Content-Type': 'application/json'})
+
+#                 # Check if the request was successful (status code 200)
+#                 if response.status_code == 200:
+#                     # Display the API response in json_display.html
+#                     api_response = response.json()
+#                     return render(request, 'json_display.html', {'json_data': json.dumps(json_array), 'api_response': api_response})
+#                 else:
+#                     # If the request was not successful, handle the error accordingly
+#                     return render(request, 'error.html', {'error_message': f'API request failed with status code {response.status_code}'})
+#             except requests.RequestException as e:
+#                 # Handle other request-related exceptions
+#                 return render(request, 'error.html', {'error_message': f'Request failed: {str(e)}'})
+
+#     return render(request, 'upload_excel.html')
 def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
