@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Excel File Content</h2>
+    <div class="table-responsive">
     <form method="post" action="{% url 'save_excel_data' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="uploaded_file" value="{{ uploaded_file.url }}">
@@ -36,6 +37,7 @@
         </table>
         <button type="submit" name="save_button">Save</button>
     </form>
+    </div>
 </div>
 </div>
 {% endblock %}
