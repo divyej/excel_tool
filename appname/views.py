@@ -67,11 +67,18 @@ def save_excel_data(request):
                 response = requests.post(api_url, json=rows, headers={'Content-Type': 'application/json'})
 
                 # Check if the request was successful (status code 200)
+         # Check if the request was successful (status code 200)
                 if response.status_code == 200:
                     # Display the API response in json_display.html
                     api_response = response.json()
-                    print("API Response:", api_response)
-                    return render(request, 'json_display.html', {'json_data': json.dumps(api_response), 'api_response': api_response})
+
+                    # Assuming api_response is a list of dictionaries where each dictionary represents a row
+                    headers = api_response[0].keys() if api_response else []
+                    api_response_cleaned = [{k: v for k, v in item.get("input", {}).items() if k != 'detail'} if 'input' in item else item for item in api_response]
+                    api_response_mapped = [{header: row.get(header, '') for header in headers} for row in api_response_cleaned]
+                    
+                    # Render the HTML template with the json_data as a table
+                    return render(request, 'json_display.html', {'headers': headers, 'rows': api_response_mapped})
                 else:
                     # If the request was not successful, handle the error accordingly
                     print(f'API request failed with status code {response.status_code}')

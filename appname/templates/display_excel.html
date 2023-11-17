@@ -10,8 +10,10 @@
             <thead class="thead-dark">
                 <tr>
                     {% for header in data.0 %}
+                
                     <th>{{ header }}</th>
                     <input type="hidden" name="headers[]" value="{{ header }}">
+                 
                     {% endfor %}
                 </tr>
             </thead>
@@ -19,8 +21,13 @@
                 {% for row in data|slice:"1:" %}
                 <tr>
                     {% for cell in row %}
+
                     <td>
+                        {% if cell %}
                         <input type="text" name="data[]" value="{{ cell }}">
+                        {% else %}
+                        <input type="text" name="data[]" value="">
+                        {% endif %}
                     </td>
                     {% endfor %}
                 </tr>

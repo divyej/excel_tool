@@ -2,53 +2,28 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>JSON Data</h2>
-    <button id="copy-button" class="btn btn-primary">Copy JSON</button>
-    <div id="json-display">
-        <pre><code id="formatted-json">{{ json_data | safe }}</code></pre>
-        
+    <h2>API Response Data</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    {% for header in headers %}
+                        <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        {% for key, value in row.items %}
+                            <td>
+                                <input type="text" class="form-control" name="{{ key }}" value="{{ value }}">
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-
-<!-- Include JSONLint library for beautifying JSON -->
-<script src="https://cdn.jsdelivr.net/npm/jsonlint" type="text/javascript"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const jsonDisplay = document.getElementById('json-display');
-        const copyButton = document.getElementById('copy-button');
-        const formattedJson = document.getElementById('formatted-json');
-
-        // Format the JSON with JSONLint (beautify)
-        try {
-            const jsonData = JSON.parse(formattedJson.textContent);
-            formattedJson.textContent = JSON.stringify(jsonData, null, 2);
-        } catch (error) {
-            console.error('Invalid JSON data:', error);
-        }
-
-        // Initialize the clipboard.js library
-        const clipboard = new ClipboardJS(copyButton, {
-            text: function() {
-                return formattedJson.textContent;
-            }
-        });
-
-        // Handle success and error events for copying
-        clipboard.on('success', function(e) {
-            e.clearSelection();
-            alert('JSON copied to clipboard');
-        });
-
-        clipboard.on('error', function(e) {
-            alert('Failed to copy JSON');
-        });
-    });
-</script>
 {% endblock %}
-
-
-
-
-
-
