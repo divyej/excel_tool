@@ -62,7 +62,7 @@ def save_excel_data(request):
             json_data = json.dumps(rows)
 
             # Send JSON data to the API
-            api_url = 'http://127.0.0.1:8000/fetch/'
+            api_url = 'http://127.0.0.1:8000/fetchdata/'
             try:
                 response = requests.post(api_url, json=rows, headers={'Content-Type': 'application/json'})
 
@@ -71,9 +71,11 @@ def save_excel_data(request):
                 if response.status_code == 200:
                     # Display the API response in json_display.html
                     api_response = response.json()
+                    print(api_response)
 
                     # Assuming api_response is a list of dictionaries where each dictionary represents a row
-                    headers = api_response[0].keys() if api_response else []
+                    headers=next(iter(api_response), {}).keys() if api_response and isinstance(api_response, list) and api_response[0] else []
+
                     api_response_cleaned = [{k: v for k, v in item.get("input", {}).items() if k != 'detail'} if 'input' in item else item for item in api_response]
                     api_response_mapped = [{header: row.get(header, '') for header in headers} for row in api_response_cleaned]
                     
